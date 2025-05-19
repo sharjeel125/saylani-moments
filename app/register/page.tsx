@@ -101,68 +101,49 @@ export default function RegisterPage() {
 
       await uploadString(imageRef, image, "data_url");
       const downloadURL = await getDownloadURL(imageRef);
-      console.log("Image uploaded to Firebase Storage:", downloadURL);
+      console.log(
+        "Image uploaded to Firebase Storage:",
+        downloadURL,
+        formData.phone
+      );
 
       const q = query(
         collection(db, "registrations"),
-        where("email", "==", formData.email)
+        where("phone", "==", formData.phone)
       );
       const querySnapshot = await getDocs(q);
 
       let docId: string;
+      console.log("querySnapshot.empty=>", querySnapshot.empty);
       if (!querySnapshot.empty) {
-        // Override user
+        console.log("OVER RIDE USER");
         docId = querySnapshot.docs[0].id;
+        console.log("formData.name=>", formData.name);
         await setDoc(doc(db, "registrations", docId), {
-          ...formData,
+          name: formData.name,
           imageUrl: downloadURL,
           timestamp: serverTimestamp(),
         });
-        console.log("User overridden with ID: ", docId);
       } else {
+        console.log("adding user ");
         // Add new user
         const docRef = await addDoc(collection(db, "registrations"), {
           ...formData,
+          name: formData.name,
           imageUrl: downloadURL,
           timestamp: serverTimestamp(),
         });
         docId = docRef.id;
-        console.log("Document written with ID: ", docId);
       }
 
-      localStorage.setItem("nief-user", JSON.stringify({ ...formData, imageUrl: downloadURL }));
-
-      // Face match API
-      try {
-        const blob = base64ToBlob(image);
-        const form = new FormData();
-        form.append("file", blob, `${formData.name}_selfie.jpg`);
-
-        const res = await fetch(
-          "https://k94g77i1lc.execute-api.ap-southeast-1.amazonaws.com/default/AmazonImageAnalyze",
-          {
-            method: "POST",
-            headers: {
-              "x-api-key": process.env.NEXT_PUBLIC_FACE_API_KEY!,
-            },
-            body: form,
-          }
-        );
-
-        if (!res.ok) {
-          const errText = await res.text();
-          throw new Error(`API error: ${res.status} - ${errText}`);
-        }
-
-        const data = await res.json();
-        console.log("API response:", data);
-        localStorage.setItem("imagedData", JSON.stringify({ ...data }));
-      } catch (err) {
-        console.error("Face match fetch failed:", err);
-        alert("Face match API failed. See console for details.");
-      }
+      localStorage.setItem(
+        "nief-user",
+        JSON.stringify({ ...formData, imageUrl: downloadURL })
+      );
 
       router.push(`/matched-images?name=${encodeURIComponent(formData.name)}`);
+
+      // Face match API
     } catch (error) {
       console.error("Error during registration:", error);
       alert("Registration failed.");
@@ -182,7 +163,7 @@ export default function RegisterPage() {
                 {/* Left */}
                 <div className="md:w-5/12 bg-gradient-to-br from-teal-600 to-emerald-500 text-white p-8">
                   <h2 className="text-3xl font-bold mb-4">
-                    Get Your Images With A Selfie
+                    Unlock Your Images With Just a Selfie
                   </h2>
                   <p className="text-teal-100 mb-6">
                     Register now to access your personalized image collection.

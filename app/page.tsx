@@ -13,7 +13,6 @@ export interface GalleryImage {
   description?: string;
 }
 
-
 const Home: React.FC = () => {
   const previewImages: GalleryImage[] = galleryImages.slice(0, 7);
 
@@ -26,14 +25,12 @@ const Home: React.FC = () => {
         <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-teal-700/10 to-transparent"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-16 md:mt-16">
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-800 via-teal-600 to-emerald-500 leading-tight">
-              Transform Your Selfies <br />
-              Into Stunning Visuals
+            <h1 className="text-5xl md:text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-800 via-teal-600 to-emerald-500 leading-tight">
+              Instantly Find Every Photo You're In
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Snap a quick selfie and unlock a world of personalized images
-              tailored just for you. Our AI-powered technology creates magical
-              transformations in seconds.
+            <p className="text-xl md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Upload your selfie to get all the photos the photographer captured
+              of you — delivered effortlessly in seconds.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link
@@ -62,7 +59,7 @@ const Home: React.FC = () => {
             <div className="relative h-[400px] md:h-[550px] rounded-2xl overflow-hidden shadow-2xl w-full">
               <Image
                 src="/bannerpic.jpg"
-                alt="AI-Powered Image Transformation"
+                alt="AI-Powered Image Matching"
                 fill
                 className="object-cover"
                 priority
@@ -71,9 +68,8 @@ const Home: React.FC = () => {
                 <div className="p-8 text-white">
                   <h2 className="text-3xl font-bold mb-2">Vision 2025</h2>
                   <p className="text-teal-100 text-lg max-w-xl">
-                    Experience the future of personal imagery. Our advanced
-                    algorithms analyze your features to create perfectly
-                    customized visuals.
+                    Discover every moment captured of you. Let our system find
+                    and deliver your photos effortlessly and instantly.
                   </p>
                 </div>
               </div>
@@ -91,7 +87,7 @@ const Home: React.FC = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-4xl font-bold text-center mb-10 bg-clip-text text-transparent bg-gradient-to-r from-teal-800 to-emerald-600">
-            Our  Partners
+            Our Partners
           </h2>
           <PartnerScroll />
         </div>

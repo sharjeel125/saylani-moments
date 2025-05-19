@@ -77,6 +77,7 @@ export default function MatchedImagesDisplay() {
     if (userinfo?.docs[0]?.data()) {
       setUser(userinfo?.docs[0]?.data());
     }
+    fetchMoreImages();
   };
 
   const downloadImage = (url: string, index: number) => {
@@ -117,7 +118,7 @@ export default function MatchedImagesDisplay() {
 
       if (!res.ok) {
         const errText = await res.text();
-        throw new Error(`API error: ${res.status} - ${errText}`);
+        return new Error(`API error: ${res.status} - ${errText}`);
       }
 
       const data = await res.json();
@@ -126,7 +127,7 @@ export default function MatchedImagesDisplay() {
       setImageUrls(urls);
     } catch (err) {
       console.error("Face match fetch failed:", err);
-      alert("Face match API failed. See console for details.");
+      // alert("Face match API failed. See console for details.");
     } finally {
       setLoading(false);
     }
@@ -159,8 +160,14 @@ export default function MatchedImagesDisplay() {
           </div>
         </div>
 
-        {imageUrls.length === 0 ? (
-          <div className="max-w-4xl text-center">
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-teal-700 text-lg font-medium">
+              Searching for matches...
+            </p>
+          </div>
+        ) : imageUrls.length === 0 ? (
+          <div className="max-w text-center">
             <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
               <Search className="w-12 h-12 mx-auto text-gray-400 mb-4" />
               <h3 className="text-lg font-medium text-gray-700 mb-2">
