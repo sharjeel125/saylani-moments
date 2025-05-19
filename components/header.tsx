@@ -24,11 +24,13 @@ export default function Header({
             tabIndex={0}
           >
             <div className="relative h-8 sm:h-10 w-8 sm:w-10 bg-white rounded-lg overflow-hidden shadow-lg transition-transform duration-300 hover:scale-105">
-              <Image src="/logo.png" alt="NIEF SAYLANI Logo" fill className="object-cover" />
+              <Image
+                src="/logo.png"
+                alt="NIEF SAYLANI Logo"
+                fill
+                className="object-cover"
+              />
             </div>
-            <span className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-teal-100">
-              NIEF SAYLANI
-            </span>
           </Link>
 
           {/* Navigation Links */}
