@@ -104,8 +104,17 @@ export default function MatchedImagesDisplay() {
     try {
       setLoading(true);
       console.log("user=>", user);
+      const imageResponse = await fetch(user.imageUrl);
+      const imageBuffer = await imageResponse.arrayBuffer();
+      const base64 = btoa(
+        new Uint8Array(imageBuffer).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      );
 
-      const blob = base64ToBlob(user.imageUrl);
+      console.log("imageBuffer=>", imageBuffer);
+      const blob = base64ToBlob(base64);
       const form = new FormData();
       form.append("file", blob, `${user.name}_selfie.jpg`);
 
@@ -215,7 +224,7 @@ export default function MatchedImagesDisplay() {
           </div>
         )}
 
-        <div className="flex justify-center items-center mt-10">
+        {/* <div className="flex justify-center items-center mt-10">
           <button
             onClick={fetchMoreImages}
             className="bg-gradient-to-r from-teal-700 rounded-xl text-sm via-teal-600 to-emerald-500 text-white px-6 py-3 disabled:opacity-60"
@@ -223,7 +232,7 @@ export default function MatchedImagesDisplay() {
           >
             {loading ? "Loading..." : "View More Images"}
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

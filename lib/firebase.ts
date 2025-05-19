@@ -1,6 +1,7 @@
 import { initializeApp, getApps, FirebaseApp } from "firebase/app";
 import { Firestore, getFirestore } from "firebase/firestore";
 import { Database, getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
@@ -13,18 +14,20 @@ const firebaseConfig = {
 };
 
 // Throw clear error if env vars are missing
-if (typeof window !== 'undefined' && !firebaseConfig.apiKey) {
+if (typeof window !== "undefined" && !firebaseConfig.apiKey) {
   throw new Error("Firebase API Key is missing. Check your .env file.");
 }
 
 let app: FirebaseApp;
 let db: Firestore;
 let rtdb: Database;
+let storage: any;
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
   db = getFirestore(app);
   rtdb = getDatabase(app);
+  storage = getStorage(app);
 }
 
-export { db, rtdb };
+export { db, rtdb, storage };

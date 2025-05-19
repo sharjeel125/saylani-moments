@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SelfieCapture } from "../../components/selfie-capture";
 import { Camera, Upload } from "lucide-react";
-import { db } from "../../lib/firebase";
+import { db, storage } from "../../lib/firebase";
 import {
   collection,
   addDoc,
@@ -19,6 +19,7 @@ import {
   setDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 
 interface FormData {
   name: string;
@@ -95,6 +96,13 @@ export default function RegisterPage() {
 
     try {
       // Check if user exists
+
+      const imageRef = ref(storage, `selfies/${formData.phone}_selfie.jpg`);
+
+      await uploadString(imageRef, image, "data_url");
+      const downloadURL = await getDownloadURL(imageRef);
+      console.log("Image uploaded to Firebase Storage:", downloadURL);
+
       const q = query(
         collection(db, "registrations"),
         where("email", "==", formData.email)
@@ -107,7 +115,7 @@ export default function RegisterPage() {
         docId = querySnapshot.docs[0].id;
         await setDoc(doc(db, "registrations", docId), {
           ...formData,
-          imageUrl: image,
+          imageUrl: downloadURL,
           timestamp: serverTimestamp(),
         });
         console.log("User overridden with ID: ", docId);
@@ -115,14 +123,14 @@ export default function RegisterPage() {
         // Add new user
         const docRef = await addDoc(collection(db, "registrations"), {
           ...formData,
-          imageUrl: image,
+          imageUrl: downloadURL,
           timestamp: serverTimestamp(),
         });
         docId = docRef.id;
         console.log("Document written with ID: ", docId);
       }
 
-      localStorage.setItem("nief-user", JSON.stringify({ ...formData }));
+      localStorage.setItem("nief-user", JSON.stringify({ ...formData, imageUrl: downloadURL }));
 
       // Face match API
       try {
@@ -148,8 +156,7 @@ export default function RegisterPage() {
 
         const data = await res.json();
         console.log("API response:", data);
-       localStorage.setItem("imagedData", JSON.stringify({ ...data }));
-
+        localStorage.setItem("imagedData", JSON.stringify({ ...data }));
       } catch (err) {
         console.error("Face match fetch failed:", err);
         alert("Face match API failed. See console for details.");
@@ -174,7 +181,9 @@ export default function RegisterPage() {
               <div className="md:flex">
                 {/* Left */}
                 <div className="md:w-5/12 bg-gradient-to-br from-teal-600 to-emerald-500 text-white p-8">
-                  <h2 className="text-3xl font-bold mb-4">Get Your Images With A Selfie</h2>
+                  <h2 className="text-3xl font-bold mb-4">
+                    Get Your Images With A Selfie
+                  </h2>
                   <p className="text-teal-100 mb-6">
                     Register now to access your personalized image collection.
                   </p>
@@ -187,14 +196,22 @@ export default function RegisterPage() {
                         </div>
                         <div>
                           <h3 className="font-semibold">
-                            {["Create Account", "Take a Selfie", "Access Your Images"][idx]}
+                            {
+                              [
+                                "Create Account",
+                                "Take a Selfie",
+                                "Access Your Images",
+                              ][idx]
+                            }
                           </h3>
                           <p className="text-sm text-teal-100">
-                            {[
-                              "Fill in your details to register",
-                              "Use our camera to capture your selfie",
-                              "Get instant access to your collection",
-                            ][idx]}
+                            {
+                              [
+                                "Fill in your details to register",
+                                "Use our camera to capture your selfie",
+                                "Get instant access to your collection",
+                              ][idx]
+                            }
                           </p>
                         </div>
                       </div>
@@ -205,7 +222,9 @@ export default function RegisterPage() {
                 {/* Right */}
                 <div className="md:w-7/12 p-8">
                   <div className="max-w-md mx-auto">
-                    <h3 className="text-2xl font-bold text-teal-800 mb-6">Create Your Account</h3>
+                    <h3 className="text-2xl font-bold text-teal-800 mb-6">
+                      Create Your Account
+                    </h3>
 
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {["name", "email", "phone"].map((field) => (
