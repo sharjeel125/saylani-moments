@@ -15,9 +15,8 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="bg-gradient-to-r from-teal-700 via-teal-600 to-emerald-500 text-white shadow-lg sticky top-0 z-50">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-3">
         <div className="flex justify-between items-center h-16 sm:h-20">
-          {/* Logo and Title */}
           <Link
             href="/"
             className="flex items-center gap-2 sm:gap-3 focus:outline-none focus:ring-2 focus:ring-teal-300 rounded-lg"
