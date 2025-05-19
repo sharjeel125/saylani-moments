@@ -122,14 +122,12 @@ export default function RegisterPage() {
         console.log("Document written with ID: ", docId);
       }
 
-      // Save to localStorage
       localStorage.setItem("nief-user", JSON.stringify({ ...formData }));
 
       // Face match API
       try {
         const blob = base64ToBlob(image);
         const form = new FormData();
-        // form.append("name", formData.name);
         form.append("file", blob, `${formData.name}_selfie.jpg`);
 
         const res = await fetch(

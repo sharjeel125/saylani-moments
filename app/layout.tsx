@@ -14,7 +14,12 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" data-arp="">
-      <body suppressHydrationWarning>{children}</body>
+      <body
+        className="font-sans bg-gray-50 text-gray-900"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

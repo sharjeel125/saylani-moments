@@ -33,9 +33,26 @@ interface User {
   timestamp?: any;
 }
 
+function base64ToBlob(base64Data: string, contentType = "image/jpeg") {
+  const byteCharacters = atob(base64Data.split(",")[1]);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+    const slice = byteCharacters.slice(offset, offset + 512);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    byteArrays.push(new Uint8Array(byteNumbers));
+  }
+
+  return new Blob(byteArrays, { type: contentType });
+}
+
 export default function MatchedImagesDisplay() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [user, setUser] = useState<User | null | any>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const userRaw = localStorage.getItem("nief-user");
@@ -79,6 +96,45 @@ export default function MatchedImagesDisplay() {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const fetchMoreImages = async () => {
+    if (!user || !user.imageUrl || !user.name) return;
+
+    try {
+      setLoading(true);
+      console.log("user=>", user);
+
+      const blob = base64ToBlob(user.imageUrl);
+      const form = new FormData();
+      form.append("file", blob, `${user.name}_selfie.jpg`);
+
+      const res = await fetch(
+        "https://k94g77i1lc.execute-api.ap-southeast-1.amazonaws.com/default/AmazonImageAnalyze",
+        {
+          method: "POST",
+          headers: {
+            "x-api-key": process.env.NEXT_PUBLIC_FACE_API_KEY!,
+          },
+          body: form,
+        }
+      );
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`API error: ${res.status} - ${errText}`);
+      }
+
+      const data = await res.json();
+      const urls = data.matches.map((m: Match) => m.signedUrl);
+      localStorage.setItem("imagedData", JSON.stringify(data));
+      setImageUrls(urls);
+    } catch (err) {
+      console.error("Face match fetch failed:", err);
+      alert("Face match API failed. See console for details.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -160,8 +216,12 @@ export default function MatchedImagesDisplay() {
         )}
 
         <div className="flex justify-center items-center mt-10">
-          <button className="bg-gradient-to-r from-teal-700 rounded-xl text-sm via-teal-600 to-emerald-500 text-white p-3">
-            <p>View More Images</p>
+          <button
+            onClick={fetchMoreImages}
+            className="bg-gradient-to-r from-teal-700 rounded-xl text-sm via-teal-600 to-emerald-500 text-white px-6 py-3 disabled:opacity-60"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "View More Images"}
           </button>
         </div>
       </div>
